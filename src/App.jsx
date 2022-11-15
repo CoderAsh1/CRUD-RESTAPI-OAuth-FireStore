@@ -10,6 +10,7 @@ import { gapi } from "gapi-script";
 function App() {
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState([]);
+
   //google authentication -START
 
   const clientId =
@@ -98,7 +99,6 @@ function App() {
       </div>
       <Link
         to="/add"
-        // className={`add btn btn-primary text-white ${!profile && "disable"}`}
         className={
           !profile
             ? "add btn btn-primary text-white disabled"
