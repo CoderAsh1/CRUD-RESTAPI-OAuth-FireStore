@@ -10,21 +10,20 @@ import { gapi } from "gapi-script";
 function App() {
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState([]);
-
   //google authentication -START
 
   const clientId =
     "100837649985-kibvr1p8uqs27cnnn78cmg9sfsldpm8r.apps.googleusercontent.com";
 
-  // useEffect(() => {
-  const initClient = () => {
-    gapi.client.init({
-      clientId: clientId,
-      scope: "",
-    });
-  };
-  gapi.load("client:auth2", initClient);
-  // }, []);
+  useEffect(() => {
+    const initClient = () => {
+      gapi.client.init({
+        clientId: clientId,
+        scope: "",
+      });
+    };
+    gapi.load("client:auth2", initClient);
+  }, []);
 
   const onSuccess = (res) => {
     setProfile(res.profileObj);
@@ -48,6 +47,7 @@ function App() {
       setPosts(rawData);
     }
     getPosts();
+    setProfile(null);
   }, []);
 
   async function handleDelete(id) {
@@ -70,10 +70,10 @@ function App() {
           <>
             <div className="profile">
               <img
-                src="https://lh3.googleusercontent.com/a/ALm5wu2pv4zmrGREeNnMnHch4OK2K9PJ36yaChae-oXo_g=s96-c"
+                src="https://lh3.googleusercontent.com/a/ALm5wu2ic5i26z70YgrRoBXzmzJ1m2V11NWKjojDGMRb=s96-c"
                 alt="imageUrl"
               />
-              <h6>{profile.name}</h6>
+              <h6>{profile.email}</h6>
             </div>
             <div className="logout">
               <GoogleLogout
@@ -84,26 +84,26 @@ function App() {
             </div>
           </>
         ) : (
-          <>
-            <div className="warn">
-              <h6>Please Login to make any changes</h6>
-            </div>
-            <div className="logout">
-              <GoogleLogin
-                clientId={clientId}
-                buttonText="Sign in"
-                onSuccess={onSuccess}
-                onFailure={onFailure}
-                cookiePolicy={"single_host_origin"}
-                isSignedIn={true}
-              />
-            </div>
-          </>
+          <div className="logout">
+            <GoogleLogin
+              clientId={clientId}
+              buttonText="Sign in"
+              onSuccess={onSuccess}
+              onFailure={onFailure}
+              cookiePolicy={"single_host_origin"}
+              isSignedIn={true}
+            />
+          </div>
         )}
       </div>
       <Link
         to="/add"
-        className={`add btn btn-primary text-white ${!profile} && 'disable'`}
+        // className={`add btn btn-primary text-white ${!profile && "disable"}`}
+        className={
+          !profile
+            ? "add btn btn-primary text-white disabled"
+            : "add btn btn-primary text-white"
+        }
       >
         +
       </Link>
@@ -129,23 +129,27 @@ function App() {
                       <h5 className="card-title">{post.title}</h5>
                       <p className="card-text ">{post.body}</p>
                       <div className="btns position-absolute bottom-0 py-2 ">
-                        {profile && (
-                          <>
-                            <Link
-                              to={"/edit/" + post.id}
-                              className="btn btn-primary"
-                            >
-                              Edit
-                            </Link>
+                        <Link
+                          to={"/edit/" + post.id}
+                          className={
+                            profile
+                              ? "btn btn-primary"
+                              : "btn btn-primary disabled"
+                          }
+                        >
+                          Edit
+                        </Link>
 
-                            <button
-                              className="btn btn-danger ms-2"
-                              onClick={() => handleDelete(post.id)}
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
+                        <button
+                          className={
+                            profile
+                              ? "btn btn-danger ms-2"
+                              : "btn btn-danger disabled ms-2"
+                          }
+                          onClick={() => handleDelete(post.id)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   </div>
